@@ -10,15 +10,20 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-    // Get all products with their category
-    $products = Product::with('category')->paginate(10);
+public function index(Request $request)
+{
+    $products = Product::with('category')
+        ->when($request->keyword, function ($query, $keyword) {
+            $query->where('name', 'like', "%{$keyword}%");
+        })
+        ->when($request->category, function ($query, $category) {
+            $query->where('category_id', $category);
+        })
+        ->paginate(10)
+        ->withQueryString();
+
     return ProductResource::collection($products);
-    }
-    /**
-     * Store a newly created resource in storage.
-     */
+}
     public function store(Request $request)
     {
         $request->validate([
@@ -45,7 +50,7 @@ class ProductController extends Controller
             'stock' => $request->stock,
             //hanya menyimpan path image ke database
             'img' => $path,
-            'slug' => Str::slug($request->name)// Generate slug from name
+            'slug' => Str::slug($request->name)
             ]);
             return new ProductResource($product);
             }
@@ -56,10 +61,6 @@ class ProductController extends Controller
     $product = Product::with('category')->findOrFail($id);
     return new ProductResource($product);
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         // Find the product
@@ -82,7 +83,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'img' => $request->img,
-            'slug' => Str::slug($request->name)// Generate slug from name
+            'slug' => Str::slug($request->name)
         ]);
         return new ProductResource($product);
     }

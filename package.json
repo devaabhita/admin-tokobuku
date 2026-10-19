@@ -15,5 +15,10 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "@tanstack/react-query": "^5.104.4",
+        "axios": "^1.20.0",
+        "react-hot-toast": "^2.6.1"
     }
 }
