@@ -21,35 +21,40 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-    // Validate the request
-    $request->validate([
-    'name' => 'required|string|max:150',
-    'description' => 'nullable|string',
-    'category_id' => 'required|exists:categories,category_id',
-    'price' => 'required|numeric',
-    'stock' => 'required|integer',
-    'img' => 'nullable|string'
-    ]);
-    // Create the product
-    $product = Product::create([
-    'name' => $request->name,
-    'description' => $request->description,
-    'category_id' => $request->category_id,
-    'price' => $request->price,
-    'stock' => $request->stock,
-    'img' => $request->img,
-    'slug' => Str::slug($request->name)// Generate slug from name
-    ]);
-    return new ProductResource($product);
-    }
+        $request->validate([
+            'name' => 'required|string|max:150',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,category_id',
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+            'img' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            ]);
+            // Initialize image path
+            $path = "";
+            //mengambil file image dari request img
+            if ($request->hasFile('img')) {
+            // menyimpan file image ke storage pada folder products di disk public
+            $path = $request->file('img')->store('products', 'public');
+            }
+            // Create the product
+            $product = Product::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            //hanya menyimpan path image ke database
+            'img' => $path,
+            'slug' => Str::slug($request->name)// Generate slug from name
+            ]);
+            return new ProductResource($product);
+            }
 
     public function show(string $id)
     {
     // Get product by ID with its category
     $product = Product::with('category')->findOrFail($id);
     return new ProductResource($product);
-
-
     }
 
     /**
