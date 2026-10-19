@@ -21,7 +21,7 @@ class ProductSeeder extends Seeder
             'description' => 'Buku tentang pembentukan kebiasaan yang baik',
             'category_id' => 3, // Pengembangan Diri
             'price' => 100000,
-            'img' => 'products/atomic-habits.jpg',
+            'img' => '',
             'stock' => 10,
             'created_at' => now(),
             'updated_at' => now(),
